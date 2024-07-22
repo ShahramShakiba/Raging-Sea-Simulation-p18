@@ -18,7 +18,7 @@ let height = window.innerHeight;
 
 //================== Object - Water ========================
 //========== Geometry
-const waterGeometry = new THREE.PlaneGeometry(2, 2, 128, 128);
+const waterGeometry = new THREE.PlaneGeometry(2, 2, 512, 512);
 
 //=== Color
 debugObj.depthColor = '#186691';
@@ -31,10 +31,16 @@ const waterMaterial = new THREE.ShaderMaterial({
   side: THREE.DoubleSide,
 
   uniforms: {
-    uWaveElevation: { value: 0.2 },
-    uFrequency: { value: new THREE.Vector2(4, 1.5) },
     uTime: { value: 0 },
-    uWaveSpeed: { value: 0.75 },
+
+    uBigWavesElevation: { value: 0.2 },
+    uBigFrequency: { value: new THREE.Vector2(4, 1.5) },
+    uBigWavesSpeed: { value: 0.75 },
+
+    uSmallWavesElevation: { value: 0.15 },
+    uSmallFrequency: { value: 3 },
+    uSmallWavesSpeed: { value: 0.2 },
+    uSmallWaveIteration: { value: 4 },
 
     uDepthColor: { value: new THREE.Color(debugObj.depthColor) },
     uSurfaceColor: { value: new THREE.Color(debugObj.surfaceColor) },
@@ -43,25 +49,36 @@ const waterMaterial = new THREE.ShaderMaterial({
   },
 });
 
-//=== Debug GUI
+//============= Debug GUI
+//=== Big Wave
 gui
-  .add(waterMaterial.uniforms.uWaveElevation, 'value', 0, 1, 0.001)
-  .name('Wave Elevation');
+  .add(waterMaterial.uniforms.uBigWavesElevation, 'value', 0, 1, 0.001)
+  .name('Big Wave Elevation');
+gui
+  .add(waterMaterial.uniforms.uBigFrequency.value, 'x', 0, 20, 0.001)
+  .name('Big Wave Frequency-X');
+gui
+  .add(waterMaterial.uniforms.uBigFrequency.value, 'y', 0, 20, 0.001)
+  .name('Big Wave Frequency-Y');
+gui
+  .add(waterMaterial.uniforms.uBigWavesSpeed, 'value', 0, 10, 0.001)
+  .name('Big Wave Speed');
 
-// Frequency
+//=== Small Wave
 gui
-  .add(waterMaterial.uniforms.uFrequency.value, 'x', 0, 20, 0.001)
-  .name('Wave Frequency-X');
+  .add(waterMaterial.uniforms.uSmallWavesElevation, 'value', 0, 1, 0.001)
+  .name('Small Wave Elevation');
 gui
-  .add(waterMaterial.uniforms.uFrequency.value, 'y', 0, 20, 0.001)
-  .name('Wave Frequency-Y');
+  .add(waterMaterial.uniforms.uSmallFrequency, 'value', 0, 30, 0.001)
+  .name('Small Wave Frequency');
+gui
+  .add(waterMaterial.uniforms.uSmallWavesSpeed, 'value', 0, 4, 0.001)
+  .name('Small Wave Speed');
+gui
+  .add(waterMaterial.uniforms.uSmallWaveIteration, 'value', 0, 5, 1)
+  .name('Small Wave Iteration');
 
-// Speed
-gui
-  .add(waterMaterial.uniforms.uWaveSpeed, 'value', 0, 10, 0.001)
-  .name('Wave Speed');
-
-// Color
+//=== Color
 gui
   .addColor(debugObj, 'depthColor')
   .name('Depth Color')
@@ -74,10 +91,10 @@ gui
   .onChange(() => {
     waterMaterial.uniforms.uSurfaceColor.value.set(debugObj.surfaceColor);
   });
-  gui
+gui
   .add(waterMaterial.uniforms.uColorOffset, 'value', 0, 1, 0.001)
   .name('Color Offset');
-  gui
+gui
   .add(waterMaterial.uniforms.uColorMultiplier, 'value', 0, 10, 0.001)
   .name('Color Multiplier');
 
