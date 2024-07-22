@@ -5,6 +5,8 @@ I rely on comments to assess the code." */
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import GUI from 'lil-gui';
 import * as THREE from 'three';
+import waterVertex from './Shaders/water/vertexWater.glsl';
+import waterFragment from './Shaders/water/fragmentWater.glsl';
 
 const canvas = document.querySelector('canvas.webgl');
 const gui = new GUI();
@@ -17,8 +19,38 @@ let height = window.innerHeight;
 //========== Geometry
 const waterGeometry = new THREE.PlaneGeometry(2, 2, 128, 128);
 
+const count = waterGeometry.attributes.position.count;
+const randoms = new Float32Array(count);
+
+for (let i = 0; i < count; i++) {
+  randoms[i] = Math.random();
+}
+
+waterGeometry.setAttribute('wRandom', new THREE.BufferAttribute(randoms, 1));
+
 //========== Material
-const waterMaterial = new THREE.MeshBasicMaterial();
+const waterMaterial = new THREE.ShaderMaterial({
+  vertexShader: waterVertex,
+  fragmentShader: waterFragment,
+  side: THREE.DoubleSide,
+
+  uniforms: {
+    uWaveElevation: { value: 0.2 },
+    uFrequency: { value: new THREE.Vector2(15, 30) },
+    uTime: { value: 0 },
+  },
+});
+
+//====== Debug GUI
+gui
+  .add(waterMaterial.uniforms.uWaveElevation, 'value', 0, 1, 0.001)
+  .name('Wave Elevation');
+gui
+  .add(waterMaterial.uniforms.uFrequency.value, 'x', 0, 30, 0.01)
+  .name('Wave Frequency-X');
+gui
+  .add(waterMaterial.uniforms.uFrequency.value, 'y', 0, 30, 0.01)
+  .name('Wave Frequency-Y');
 
 //========== Mesh
 const water = new THREE.Mesh(waterGeometry, waterMaterial);
@@ -59,6 +91,8 @@ const clock = new THREE.Clock();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+
+  waterMaterial.uniforms.uTime.value = elapsedTime;
 
   controls.update();
   renderer.render(scene, camera);
