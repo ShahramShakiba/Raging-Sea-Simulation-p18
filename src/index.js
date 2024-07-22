@@ -9,8 +9,9 @@ import waterVertex from './Shaders/water/vertexWater.glsl';
 import waterFragment from './Shaders/water/fragmentWater.glsl';
 
 const canvas = document.querySelector('canvas.webgl');
-const gui = new GUI();
 const scene = new THREE.Scene();
+const gui = new GUI();
+const debugObj = {};
 
 let width = window.innerWidth;
 let height = window.innerHeight;
@@ -19,14 +20,9 @@ let height = window.innerHeight;
 //========== Geometry
 const waterGeometry = new THREE.PlaneGeometry(2, 2, 128, 128);
 
-const count = waterGeometry.attributes.position.count;
-const randoms = new Float32Array(count);
-
-for (let i = 0; i < count; i++) {
-  randoms[i] = Math.random();
-}
-
-waterGeometry.setAttribute('wRandom', new THREE.BufferAttribute(randoms, 1));
+//=== Color
+debugObj.depthColor = '#186691';
+debugObj.surfaceColor = '#9bd8ff';
 
 //========== Material
 const waterMaterial = new THREE.ShaderMaterial({
@@ -36,25 +32,54 @@ const waterMaterial = new THREE.ShaderMaterial({
 
   uniforms: {
     uWaveElevation: { value: 0.2 },
-    uFrequency: { value: new THREE.Vector2(5, 10) },
+    uFrequency: { value: new THREE.Vector2(4, 1.5) },
     uTime: { value: 0 },
     uWaveSpeed: { value: 0.75 },
+
+    uDepthColor: { value: new THREE.Color(debugObj.depthColor) },
+    uSurfaceColor: { value: new THREE.Color(debugObj.surfaceColor) },
+    uColorOffset: { value: 0.08 },
+    uColorMultiplier: { value: 5 },
   },
 });
 
-//====== Debug GUI
+//=== Debug GUI
 gui
   .add(waterMaterial.uniforms.uWaveElevation, 'value', 0, 1, 0.001)
   .name('Wave Elevation');
-  gui
+
+// Frequency
+gui
   .add(waterMaterial.uniforms.uFrequency.value, 'x', 0, 20, 0.001)
   .name('Wave Frequency-X');
-  gui
+gui
   .add(waterMaterial.uniforms.uFrequency.value, 'y', 0, 20, 0.001)
   .name('Wave Frequency-Y');
+
+// Speed
+gui
+  .add(waterMaterial.uniforms.uWaveSpeed, 'value', 0, 10, 0.001)
+  .name('Wave Speed');
+
+// Color
+gui
+  .addColor(debugObj, 'depthColor')
+  .name('Depth Color')
+  .onChange(() => {
+    waterMaterial.uniforms.uDepthColor.value.set(debugObj.depthColor);
+  });
+gui
+  .addColor(debugObj, 'surfaceColor')
+  .name('Surface Color')
+  .onChange(() => {
+    waterMaterial.uniforms.uSurfaceColor.value.set(debugObj.surfaceColor);
+  });
   gui
-    .add(waterMaterial.uniforms.uWaveSpeed, 'value', 0, 10, 0.001)
-    .name('Wave Speed');
+  .add(waterMaterial.uniforms.uColorOffset, 'value', 0, 1, 0.001)
+  .name('Color Offset');
+  gui
+  .add(waterMaterial.uniforms.uColorMultiplier, 'value', 0, 10, 0.001)
+  .name('Color Multiplier');
 
 //========== Mesh
 const water = new THREE.Mesh(waterGeometry, waterMaterial);

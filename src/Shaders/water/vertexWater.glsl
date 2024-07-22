@@ -3,8 +3,6 @@ uniform vec2 uFrequency;
 uniform float uTime;
 uniform float uWaveSpeed;
 
-attribute float wRandom;
-
 varying float vElevation;
 
 void main() {
