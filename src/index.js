@@ -14,7 +14,7 @@ const scene = new THREE.Scene();
 let width = window.innerWidth;
 let height = window.innerHeight;
 
-//================== Object - Water ========================
+//================ Object - Water =====================
 //========== Geometry
 const waterGeometry = new THREE.PlaneGeometry(2, 2, 512, 512);
 
@@ -27,19 +27,19 @@ const waterMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
 
-    uBigWavesElevation: { value: 0.2 },
+    uBigWavesElevation: { value: 0.3 },
     uBigFrequency: { value: new THREE.Vector2(4, 1.5) },
-    uBigWavesSpeed: { value: 0.75 },
+    uBigWavesSpeed: { value: 0.8 },
 
-    uSmallWavesElevation: { value: 0.15 },
-    uSmallFrequency: { value: 3 },
-    uSmallWavesSpeed: { value: 0.2 },
-    uSmallWaveIteration: { value: 4 },
+    uSmallWavesElevation: { value: 0.2 },
+    uSmallFrequency: { value: 4 },
+    uSmallWavesSpeed: { value: 0.3 },
+    uSmallWaveIteration: { value: 5 },
 
     uDepthColor: { value: new THREE.Color(debugObj.depthColor) },
     uSurfaceColor: { value: new THREE.Color(debugObj.surfaceColor) },
-    uColorOffset: { value: 0.08 },
-    uColorMultiplier: { value: 5 },
+    uColorOffset: { value: 0.1 },
+    uColorMultiplier: { value: 3 },
   },
 });
 

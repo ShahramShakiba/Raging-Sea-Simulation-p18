@@ -1,7 +1,7 @@
 import GUI from 'lil-gui';
 
 const debugObj = {
-  depthColor: '#0a254e',
+  depthColor: '#083D77',
   surfaceColor: '#507dc4',
 };
 
