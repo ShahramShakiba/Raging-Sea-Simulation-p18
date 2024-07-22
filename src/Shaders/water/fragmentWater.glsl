@@ -23,3 +23,7 @@ mix(value1, value2, value3)
    if value3 = 0 -> mix will be value1
    if value3 = 1 -> mix will be value2
    if value3 = 0.5 -> mix will be a range between value1 and value2 */
+
+   /* add foam
+    enlarge the plane 
+    add fog to hide the edges */
