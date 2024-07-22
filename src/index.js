@@ -36,8 +36,9 @@ const waterMaterial = new THREE.ShaderMaterial({
 
   uniforms: {
     uWaveElevation: { value: 0.2 },
-    uFrequency: { value: new THREE.Vector2(15, 30) },
+    uFrequency: { value: new THREE.Vector2(5, 10) },
     uTime: { value: 0 },
+    uWaveSpeed: { value: 0.75 },
   },
 });
 
@@ -45,12 +46,15 @@ const waterMaterial = new THREE.ShaderMaterial({
 gui
   .add(waterMaterial.uniforms.uWaveElevation, 'value', 0, 1, 0.001)
   .name('Wave Elevation');
-gui
-  .add(waterMaterial.uniforms.uFrequency.value, 'x', 0, 30, 0.01)
+  gui
+  .add(waterMaterial.uniforms.uFrequency.value, 'x', 0, 20, 0.001)
   .name('Wave Frequency-X');
-gui
-  .add(waterMaterial.uniforms.uFrequency.value, 'y', 0, 30, 0.01)
+  gui
+  .add(waterMaterial.uniforms.uFrequency.value, 'y', 0, 20, 0.001)
   .name('Wave Frequency-Y');
+  gui
+    .add(waterMaterial.uniforms.uWaveSpeed, 'value', 0, 10, 0.001)
+    .name('Wave Speed');
 
 //========== Mesh
 const water = new THREE.Mesh(waterGeometry, waterMaterial);
