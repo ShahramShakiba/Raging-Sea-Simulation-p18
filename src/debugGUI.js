@@ -1,15 +1,15 @@
 import GUI from 'lil-gui';
 
 const debugObj = {
-  depthColor: '#0a3d62',
-  surfaceColor: '#315b7d',
-  fogColor: '#d3b597', 
+  depthColor: '#01121e',
+  surfaceColor: '#091f2f',
+  fogColor: '#a5998d', 
 };
 
 const debugGUI = (waterMaterial, scene, THREE) => {
-  const gui = new GUI().title('Raging Sea').close();
+  const gui = new GUI().title('Raging Sea');
 
- //======= Fog Color
+ //====== Fog Color
  gui
  .addColor(debugObj, 'fogColor')
  .name('Fog Color')

@@ -62,7 +62,7 @@ scene.add(water);
 
 //===================== Camera =========================
 const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 100);
-camera.position.set(1, 0.3, 3);
+camera.position.set(1, 0.4, 3);
 scene.add(camera);
 
 //================ Orbit Controls ======================
