@@ -38,7 +38,7 @@ const waterMaterial = new THREE.ShaderMaterial({
 
     uSmallWavesElevation: { value: 0.159 },
     uSmallFrequency: { value: 3.885 },
-    uSmallWavesSpeed: { value: 0.606 },
+    uSmallWavesSpeed: { value: 0.706 },
     uSmallWaveIteration: { value: 5 },
 
     uDepthColor: { value: new THREE.Color(debugObj.depthColor) },
@@ -102,13 +102,68 @@ audioLoader.load('./music/Thunderstorm.mp3', (buffer) => {
   sound.play();
 });
 
+//================= Rain Particles ====================
+const particleCount = 20000;
+const particles = new THREE.BufferGeometry();
+const particlePositions = new Float32Array(particleCount * 3);
+
+for (let i = 0; i < particleCount; i++) {
+  particlePositions[i * 3] = (Math.random() - 0.5) * 30; // X position
+  particlePositions[i * 3 + 1] = Math.random() * 10; // Y position
+  particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 30; // Z position
+}
+
+particles.setAttribute(
+  'position',
+  new THREE.BufferAttribute(particlePositions, 3)
+);
+
+// Load the raindrop texture
+const textureLoader = new THREE.TextureLoader();
+const rainTexture = textureLoader.load('./textures/rain.png');
+
+const particleMaterial = new THREE.PointsMaterial({
+  map: rainTexture,
+  color: 0xaaaaaa,
+  size: 0.02,
+  transparent: true,
+  alphaTest: 0.5,
+});
+
+const particleSystem = new THREE.Points(particles, particleMaterial);
+scene.add(particleSystem);
+
 //=================== Animate =======================
 const clock = new THREE.Clock();
+
+//==== Wind speed
+const windSpeedX = -0.05;
+const windSpeedZ = -0.05;
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
+  //====== Update water material time
   waterMaterial.uniforms.uTime.value = elapsedTime;
+
+  //====== Update particles-rain position
+  const positions = particles.attributes.position.array;
+
+  for (let i = 0; i < particleCount; i++) {
+    const i3 = i * 3;
+
+    positions[i3 + 1] -= 0.1; // Move particles down
+    positions[i3] += windSpeedX; // Apply wind effect in the x direction
+    positions[i3 + 2] += windSpeedZ; // Apply wind effect in the z direction
+
+    // Reset particles position when they reach the ground or move out of bounds
+    if (positions[i3 + 1] < 0) {
+      positions[i3 + 1] = Math.random() * 5;
+      positions[i3] = (Math.random() - 0.5) * 30; // Reset X position
+      positions[i3 + 2] = (Math.random() - 0.5) * 30; // Reset Z position
+    }
+  }
+  particles.attributes.position.needsUpdate = true;
 
   controls.update();
   renderer.render(scene, camera);
