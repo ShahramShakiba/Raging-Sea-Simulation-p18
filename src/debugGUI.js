@@ -1,12 +1,24 @@
 import GUI from 'lil-gui';
 
 const debugObj = {
-  depthColor: '#083D77',
-  surfaceColor: '#507dc4',
+  depthColor: '#0a3d62',
+  surfaceColor: '#315b7d',
+  fogColor: '#d3b597', 
 };
 
-const debugGUI = (waterMaterial) => {
+const debugGUI = (waterMaterial, scene, THREE) => {
   const gui = new GUI();
+
+ //======= Fog Color
+ gui
+ .addColor(debugObj, 'fogColor')
+ .name('Fog Color')
+ .onChange(() => {
+   const color = new THREE.Color(debugObj.fogColor);
+   scene.fog.color.set(color);
+   scene.background = color;
+   waterMaterial.uniforms.fogColor.value.set(color);
+ });
 
   //====== Big Waves
   gui
