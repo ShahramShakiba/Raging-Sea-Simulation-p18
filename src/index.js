@@ -16,7 +16,7 @@ let height = window.innerHeight;
 
 //==================== Fog ============================
 const fogColor = new THREE.Color(debugObj.fogColor);
-scene.fog = new THREE.Fog(fogColor, 0.1, 6);
+scene.fog = new THREE.Fog(fogColor, 0.1, 8);
 scene.background = fogColor;
 
 //================ Object - Water =====================
@@ -32,13 +32,13 @@ const waterMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
 
-    uBigWavesElevation: { value: 0.2 },
-    uBigFrequency: { value: new THREE.Vector2(3, 1.3) },
-    uBigWavesSpeed: { value: 1.027 },
+    uBigWavesElevation: { value: 0.35 },
+    uBigFrequency: { value: new THREE.Vector2(2, 1.1) },
+    uBigWavesSpeed: { value: 1.327 },
 
-    uSmallWavesElevation: { value: 0.139 },
-    uSmallFrequency: { value: 2.885 },
-    uSmallWavesSpeed: { value: 0.306 },
+    uSmallWavesElevation: { value: 0.159 },
+    uSmallFrequency: { value: 3.885 },
+    uSmallWavesSpeed: { value: 0.606 },
     uSmallWaveIteration: { value: 5 },
 
     uDepthColor: { value: new THREE.Color(debugObj.depthColor) },
@@ -62,7 +62,7 @@ scene.add(water);
 
 //===================== Camera =========================
 const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 100);
-camera.position.set(1, 0.4, 3);
+camera.position.set(1, 0.7, 3);
 scene.add(camera);
 
 //================ Orbit Controls ======================
@@ -87,6 +87,19 @@ window.addEventListener('resize', () => {
 
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+//================= Wave Sound ======================
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+const sound = new THREE.Audio(listener);
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load('./music/Thunderstorm.mp3', (buffer) => {
+  sound.setBuffer(buffer);
+  sound.setLoop(true);
+  sound.setVolume(0.5);
+  sound.play();
 });
 
 //=================== Animate =======================

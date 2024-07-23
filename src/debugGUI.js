@@ -1,9 +1,9 @@
 import GUI from 'lil-gui';
 
 const debugObj = {
-  depthColor: '#01121e',
-  surfaceColor: '#091f2f',
-  fogColor: '#a5998d', 
+  depthColor: '#10222d',
+  surfaceColor: '#04151f',
+  fogColor: '#4f4d4a', 
 };
 
 const debugGUI = (waterMaterial, scene, THREE) => {
