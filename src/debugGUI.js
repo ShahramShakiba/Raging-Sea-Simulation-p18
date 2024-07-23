@@ -7,7 +7,7 @@ const debugObj = {
 };
 
 const debugGUI = (waterMaterial, scene, THREE) => {
-  const gui = new GUI();
+  const gui = new GUI().title('Raging Sea').close();
 
  //======= Fog Color
  gui

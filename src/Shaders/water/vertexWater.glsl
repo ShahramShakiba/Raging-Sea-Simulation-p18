@@ -15,16 +15,25 @@ varying float vElevation;
 void main() {
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
-    float elevation = sin(modelPosition.x * uBigFrequency.x + uTime * uBigWavesSpeed) * sin(modelPosition.z * uBigFrequency.y + uTime * uBigWavesSpeed) * uBigWavesElevation;
+    float elevation = 
+        sin(modelPosition.x * uBigFrequency.x + uTime * uBigWavesSpeed) * 
+        sin(modelPosition.z * uBigFrequency.y + uTime * uBigWavesSpeed) * uBigWavesElevation;
 
     for (float i = 1.0; i <= uSmallWaveIteration; i++) {
-        elevation -= abs(cnoise(vec3(modelPosition.xz * uSmallFrequency * i, uTime * uSmallWavesSpeed))) * uSmallWavesElevation / i;
+        elevation -= 
+          abs(
+            cnoise(
+              vec3(
+                modelPosition.xz * uSmallFrequency * i, uTime * uSmallWavesSpeed
+              )
+            )
+          ) * uSmallWavesElevation / i;
     }
 
     modelPosition.y += elevation;
+
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectionPosition = projectionMatrix * viewPosition;
-
     vElevation = elevation;
 
     gl_Position = projectionPosition;
