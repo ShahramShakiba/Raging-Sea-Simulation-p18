@@ -21,7 +21,7 @@ const rainTexture = textureLoader.load('./textures/rain.png');
 
 //=================== Fog ==========================
 const fogColor = new THREE.Color(debugObj.fogColor);
-scene.fog = new THREE.Fog(fogColor, 0.1, 10);
+scene.fog = new THREE.Fog(fogColor, 0.1, 14);
 scene.background = fogColor;
 
 //============== Object - Water ====================
@@ -37,17 +37,17 @@ const waterMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
 
-    uBigWavesElevation: { value: 0.38 },
     uBigFrequency: { value: new THREE.Vector2(2, 1.1) },
-    uBigWavesSpeed: { value: 1.327 },
+    uBigWavesElevation: { value: 0.38 },
+    uBigWavesSpeed: { value: 1.427 },
 
-    uSmallWavesElevation: { value: 0.159 },
-    uSmallFrequency: { value: 4.123 },
-    uSmallWavesSpeed: { value: 0.706 },
+    uSmallFrequency: { value: 3.123 },
+    uSmallWavesElevation: { value: 0.139 },
+    uSmallWavesSpeed: { value: 0.506 },
     uSmallWaveIteration: { value: 4 },
 
-    uNoiseScale: { value: 1.5 }, // Set initial value for noise scale
-    uNoiseStrength: { value: 0.2 }, // Set initial value for noise strength
+    uNoiseScale: { value: 0.343 }, // Set initial value for noise scale
+    uNoiseStrength: { value: 0.5 }, // Set initial value for noise strength
 
     uDepthColor: { value: new THREE.Color(debugObj.depthColor) },
     uSurfaceColor: { value: new THREE.Color(debugObj.surfaceColor) },
