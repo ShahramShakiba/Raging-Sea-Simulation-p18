@@ -13,13 +13,18 @@ const scene = new THREE.Scene();
 
 let width = window.innerWidth;
 let height = window.innerHeight;
+const clock = new THREE.Clock();
 
-//==================== Fog ============================
+//================= Textures =======================
+const textureLoader = new THREE.TextureLoader();
+const rainTexture = textureLoader.load('./textures/rain.png');
+
+//=================== Fog ==========================
 const fogColor = new THREE.Color(debugObj.fogColor);
 scene.fog = new THREE.Fog(fogColor, 0.1, 10);
 scene.background = fogColor;
 
-//================ Object - Water =====================
+//============== Object - Water ====================
 //========== Geometry
 const waterGeometry = new THREE.PlaneGeometry(30, 30, 364, 364);
 
@@ -37,7 +42,7 @@ const waterMaterial = new THREE.ShaderMaterial({
     uBigWavesSpeed: { value: 1.327 },
 
     uSmallWavesElevation: { value: 0.159 },
-    uSmallFrequency: { value: 5.123 },
+    uSmallFrequency: { value: 4.123 },
     uSmallWavesSpeed: { value: 0.706 },
     uSmallWaveIteration: { value: 4 },
 
@@ -60,16 +65,46 @@ const water = new THREE.Mesh(waterGeometry, waterMaterial);
 water.rotation.x = -Math.PI * 0.5;
 scene.add(water);
 
-//===================== Camera =========================
+//=============== Rain Particles ==================
+const rainParticleCount = 7000;
+const rainParticles = new THREE.BufferGeometry();
+const particlePositions = new Float32Array(rainParticleCount * 3);
+
+for (let i = 0; i < rainParticleCount; i++) {
+  const i3 = i * 3;
+
+  //=== initial position
+  particlePositions[i3] = (Math.random() - 0.5) * 5; // value: -2.5 & 2.5
+  particlePositions[i3 + 1] = Math.random() * 5;
+  particlePositions[i3 + 2] = (Math.random() - 0.5) * 5;
+}
+
+rainParticles.setAttribute(
+  'position',
+  new THREE.BufferAttribute(particlePositions, 3)
+);
+
+const particleMaterial = new THREE.PointsMaterial({
+  map: rainTexture,
+  color: 0xaaaaaa,
+  size: 0.025,
+  transparent: true,
+  alphaTest: 0.5,
+});
+
+const rainSystem = new THREE.Points(rainParticles, particleMaterial);
+scene.add(rainSystem);
+
+//=================== Camera =======================
 const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 100);
 camera.position.set(1, 0.7, 3);
 scene.add(camera);
 
-//================ Orbit Controls ======================
+//============== Orbit Controls ====================
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 
-//==================== Renderer ========================
+//================== Renderer ======================
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
   antialias: false,
@@ -77,10 +112,10 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(width, height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-//================ Resize Listener ====================
+//============== Resize Listener ===================
 let resizeTimeout;
 
-function onWindowResize() {
+const onWindowResize = () => {
   clearTimeout(resizeTimeout);
 
   resizeTimeout = setTimeout(() => {
@@ -93,11 +128,11 @@ function onWindowResize() {
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   }, 200);
-}
+};
 
 window.addEventListener('resize', onWindowResize);
 
-//================= Wave Sound ======================
+//=============== Wave Sound ======================
 const listener = new THREE.AudioListener();
 camera.add(listener);
 
@@ -110,68 +145,36 @@ audioLoader.load('./music/Thunderstorm.mp3', (buffer) => {
   sound.play();
 });
 
-//================= Rain Particles ====================
-const particleCount = 7000;
-const particles = new THREE.BufferGeometry();
-const particlePositions = new Float32Array(particleCount * 3);
-
-for (let i = 0; i < particleCount; i++) {
-  particlePositions[i * 3] = (Math.random() - 0.5) * 30; // X position
-  particlePositions[i * 3 + 1] = Math.random() * 10; // Y position
-  particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 30; // Z position
-}
-
-particles.setAttribute(
-  'position',
-  new THREE.BufferAttribute(particlePositions, 3)
-);
-
-// Load the raindrop texture
-const textureLoader = new THREE.TextureLoader();
-const rainTexture = textureLoader.load('./textures/rain.png');
-
-const particleMaterial = new THREE.PointsMaterial({
-  map: rainTexture,
-  color: 0xaaaaaa,
-  size: 0.025,
-  transparent: true,
-  alphaTest: 0.5,
-});
-
-const particleSystem = new THREE.Points(particles, particleMaterial);
-scene.add(particleSystem);
-
-//=================== Animate =======================
-const clock = new THREE.Clock();
-
-//==== Wind speed
+//================= Animate ======================
+//=== Wind speed
 const windSpeedX = -0.02;
 const windSpeedZ = -0.02;
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  //====== Update water material time
+  //=== Update water material time
   waterMaterial.uniforms.uTime.value = elapsedTime;
 
-  //====== Update particles-rain position
-  const positions = particles.attributes.position.array;
+  //=== Update particles-rain position
+  const positions = rainParticles.attributes.position.array;
 
-  for (let i = 0; i < particleCount; i++) {
+  for (let i = 0; i < rainParticleCount; i++) {
     const i3 = i * 3;
 
-    positions[i3 + 1] -= 0.1; // Move particles down
-    positions[i3] += windSpeedX; // Apply wind effect in the x direction
-    positions[i3 + 2] += windSpeedZ; // Apply wind effect in the z direction
+    positions[i3 + 1] -= 0.1; // Move rainParticles down
+    positions[i3] += windSpeedX;
+    positions[i3 + 2] += windSpeedZ;
 
-    // Reset particles position when they reach the ground or move out of bounds
+    // Reset rain position if they hit the ground or go out of bounds
     if (positions[i3 + 1] < 0) {
+      // moving the particle back above the ground
       positions[i3 + 1] = Math.random() * 5;
-      positions[i3] = (Math.random() - 0.5) * 30; // Reset X position
-      positions[i3 + 2] = (Math.random() - 0.5) * 30; // Reset Z position
+      positions[i3] = (Math.random() - 0.5) * 5;
+      positions[i3 + 2] = (Math.random() - 0.5) * 5;
     }
   }
-  particles.attributes.position.needsUpdate = true;
+  rainParticles.attributes.position.needsUpdate = true;
 
   controls.update();
   renderer.render(scene, camera);
@@ -180,7 +183,7 @@ const tick = () => {
 
 tick();
 
-//================= Pause and Resume ======================
+//============= Pause and Resume ==================
 const pause = () => {
   if (sound.isPlaying) {
     sound.pause();
@@ -197,7 +200,7 @@ const resume = () => {
   tick();
 };
 
-// Handle visibility change
+//====== Handle visibility change - tab change
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     pause();
@@ -206,39 +209,44 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-//================= Destroy Method ======================
+//=============== Destroy Method ===================
+window.addEventListener('beforeunload', destroy);
+
 const destroy = () => {
-  // Dispose of geometry
   waterGeometry.dispose();
 
-  // Dispose of materials
   waterMaterial.dispose();
   particleMaterial.dispose();
 
-  // Dispose of textures
   rainTexture.dispose();
 
-  // Stop audio
   if (sound.isPlaying) {
     sound.stop();
   }
 
-  // Remove the mesh from the scene
+  //=== Remove the mesh 
   scene.remove(water);
-  scene.remove(particleSystem);
+  scene.remove(rainSystem);
 
-  // Remove the audio listener from the camera
+  //=== Remove the audio-listener 
   camera.remove(listener);
 
-  // Remove the resize event listener
+  //=== Remove the resize event listener
   window.removeEventListener('resize', onWindowResize);
 
-  // Dispose of renderer
   renderer.dispose();
 };
 
-// Attach destroy method to beforeunload event
-window.addEventListener('beforeunload', destroy);
+/************* resizeTimeout
+ - Optimize Event Listeners: It waits 200 milliseconds after resizing stops before making the adjustments to avoid excessive updates during resizing. */
 
-/********** resizeTimeout
- - Optimize Event Listeners: Debounce or throttle resize and other event listeners to prevent excessive calls. */
+/************ animationFrameId
+  - is a variable that stores the ID returned by the "requestAnimationFrame" function. This ID is unique for each frame requested and is used to cancel the animation frame request if needed. */
+
+/************* cancelAnimationFrame
+ -  is a function that takes the ID of an animation frame request (the one stored in animationFrameId) and cancels it. This stops the callback associated with that request from being called. */
+
+ /************ beforeunload
+  - is a browser event that is triggered just before a user leaves the page, such as by closing the tab or navigating to a different URL. 
+  
+  - This event gives developers the opportunity to run cleanup operations or prompt the user with a message before they leave the page. */
