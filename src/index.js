@@ -16,12 +16,12 @@ let height = window.innerHeight;
 
 //==================== Fog ============================
 const fogColor = new THREE.Color(debugObj.fogColor);
-scene.fog = new THREE.Fog(fogColor, 0.1, 8);
+scene.fog = new THREE.Fog(fogColor, 0.1, 10);
 scene.background = fogColor;
 
 //================ Object - Water =====================
 //========== Geometry
-const waterGeometry = new THREE.PlaneGeometry(30, 30, 720, 720);
+const waterGeometry = new THREE.PlaneGeometry(30, 30, 364, 364);
 
 //========== Material
 const waterMaterial = new THREE.ShaderMaterial({
@@ -32,14 +32,14 @@ const waterMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
 
-    uBigWavesElevation: { value: 0.35 },
+    uBigWavesElevation: { value: 0.38 },
     uBigFrequency: { value: new THREE.Vector2(2, 1.1) },
     uBigWavesSpeed: { value: 1.327 },
 
     uSmallWavesElevation: { value: 0.159 },
-    uSmallFrequency: { value: 3.885 },
+    uSmallFrequency: { value: 5.123 },
     uSmallWavesSpeed: { value: 0.706 },
-    uSmallWaveIteration: { value: 5 },
+    uSmallWaveIteration: { value: 4 },
 
     uDepthColor: { value: new THREE.Color(debugObj.depthColor) },
     uSurfaceColor: { value: new THREE.Color(debugObj.surfaceColor) },
@@ -72,22 +72,30 @@ controls.enableDamping = true;
 //==================== Renderer ========================
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
-  antialias: true,
+  antialias: false,
 });
 renderer.setSize(width, height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 //================ Resize Listener ====================
-window.addEventListener('resize', () => {
-  width = window.innerWidth;
-  height = window.innerHeight;
+let resizeTimeout;
 
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
+function onWindowResize() {
+  clearTimeout(resizeTimeout);
 
-  renderer.setSize(width, height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
+  resizeTimeout = setTimeout(() => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  }, 200);
+}
+
+window.addEventListener('resize', onWindowResize);
 
 //================= Wave Sound ======================
 const listener = new THREE.AudioListener();
@@ -103,7 +111,7 @@ audioLoader.load('./music/Thunderstorm.mp3', (buffer) => {
 });
 
 //================= Rain Particles ====================
-const particleCount = 20000;
+const particleCount = 5000;
 const particles = new THREE.BufferGeometry();
 const particlePositions = new Float32Array(particleCount * 3);
 
@@ -125,7 +133,7 @@ const rainTexture = textureLoader.load('./textures/rain.png');
 const particleMaterial = new THREE.PointsMaterial({
   map: rainTexture,
   color: 0xaaaaaa,
-  size: 0.02,
+  size: 0.025,
   transparent: true,
   alphaTest: 0.5,
 });
@@ -137,8 +145,8 @@ scene.add(particleSystem);
 const clock = new THREE.Clock();
 
 //==== Wind speed
-const windSpeedX = -0.05;
-const windSpeedZ = -0.05;
+const windSpeedX = -0.02;
+const windSpeedZ = -0.02;
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
@@ -171,3 +179,66 @@ const tick = () => {
 };
 
 tick();
+
+//================= Pause and Resume ======================
+const pause = () => {
+  if (sound.isPlaying) {
+    sound.pause();
+  }
+  if (animationFrameId) {
+    window.cancelAnimationFrame(animationFrameId);
+  }
+};
+
+const resume = () => {
+  if (!sound.isPlaying) {
+    sound.play();
+  }
+  tick();
+};
+
+// Handle visibility change
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    pause();
+  } else {
+    resume();
+  }
+});
+
+//================= Destroy Method ======================
+const destroy = () => {
+  // Dispose of geometry
+  waterGeometry.dispose();
+
+  // Dispose of materials
+  waterMaterial.dispose();
+  particleMaterial.dispose();
+
+  // Dispose of textures
+  rainTexture.dispose();
+
+  // Stop audio
+  if (sound.isPlaying) {
+    sound.stop();
+  }
+
+  // Remove the mesh from the scene
+  scene.remove(water);
+  scene.remove(particleSystem);
+
+  // Remove the audio listener from the camera
+  camera.remove(listener);
+
+  // Remove the resize event listener
+  window.removeEventListener('resize', onWindowResize);
+
+  // Dispose of renderer
+  renderer.dispose();
+};
+
+// Attach destroy method to beforeunload event
+window.addEventListener('beforeunload', destroy);
+
+/********** resizeTimeout
+ - Optimize Event Listeners: Debounce or throttle resize and other event listeners to prevent excessive calls. */
