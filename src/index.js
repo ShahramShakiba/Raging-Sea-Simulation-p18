@@ -111,7 +111,7 @@ audioLoader.load('./music/Thunderstorm.mp3', (buffer) => {
 });
 
 //================= Rain Particles ====================
-const particleCount = 5000;
+const particleCount = 7000;
 const particles = new THREE.BufferGeometry();
 const particlePositions = new Float32Array(particleCount * 3);
 
