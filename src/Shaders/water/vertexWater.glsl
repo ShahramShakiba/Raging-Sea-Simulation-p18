@@ -9,18 +9,21 @@ uniform float uSmallWavesElevation;
 uniform float uSmallFrequency;
 uniform float uSmallWavesSpeed;
 uniform float uSmallWaveIteration;
+uniform float uNoiseScale; 
+uniform float uNoiseStrength; 
 
 varying float vElevation;
 
 void main() {
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
-    float elevation = 
+    float bigWaveElevation = 
         sin(modelPosition.x * uBigFrequency.x + uTime * uBigWavesSpeed) * 
         sin(modelPosition.z * uBigFrequency.y + uTime * uBigWavesSpeed) * uBigWavesElevation;
 
+    float smallWaveElevation = 0.0;
     for (float i = 1.0; i <= uSmallWaveIteration; i++) {
-        elevation -= 
+        smallWaveElevation -= 
           abs(
             cnoise(
               vec3(
@@ -30,10 +33,21 @@ void main() {
           ) * uSmallWavesElevation / i;
     }
 
+    //===== Add Perlin noise for more randomness
+    float noise = 
+      cnoise(
+        vec3(
+          modelPosition.xz * uNoiseScale, uTime * 0.1
+          )
+      ) * uNoiseStrength;
+
+    float elevation = bigWaveElevation + smallWaveElevation + noise;
+
     modelPosition.y += elevation;
 
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectionPosition = projectionMatrix * viewPosition;
+    
     vElevation = elevation;
 
     gl_Position = projectionPosition;

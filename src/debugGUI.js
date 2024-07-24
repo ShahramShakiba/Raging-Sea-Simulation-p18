@@ -3,22 +3,22 @@ import GUI from 'lil-gui';
 const debugObj = {
   depthColor: '#10222d',
   surfaceColor: '#04151f',
-  fogColor: '#4f4d4a', 
+  fogColor: '#4f4d4a',
 };
 
 const debugGUI = (waterMaterial, scene, THREE) => {
   const gui = new GUI().title('Raging Sea');
 
- //====== Fog Color
- gui
- .addColor(debugObj, 'fogColor')
- .name('Fog Color')
- .onChange(() => {
-   const color = new THREE.Color(debugObj.fogColor);
-   scene.fog.color.set(color);
-   scene.background = color;
-   waterMaterial.uniforms.fogColor.value.set(color);
- });
+  //====== Fog Color
+  gui
+    .addColor(debugObj, 'fogColor')
+    .name('Fog Color')
+    .onChange(() => {
+      const color = new THREE.Color(debugObj.fogColor);
+      scene.fog.color.set(color);
+      scene.background = color;
+      waterMaterial.uniforms.fogColor.value.set(color);
+    });
 
   //====== Big Waves
   gui
@@ -67,6 +67,20 @@ const debugGUI = (waterMaterial, scene, THREE) => {
   gui
     .add(waterMaterial.uniforms.uColorMultiplier, 'value', 0, 10, 0.001)
     .name('Color Multiplier');
+
+  //===== noise parameters
+  gui
+    .add(waterMaterial.uniforms.uNoiseScale, 'value')
+    .min(0)
+    .max(10)
+    .step(0.01)
+    .name('Noise Scale');
+  gui
+    .add(waterMaterial.uniforms.uNoiseStrength, 'value')
+    .min(0)
+    .max(1)
+    .step(0.01)
+    .name('Noise Strength');
 
   return gui;
 };

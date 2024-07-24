@@ -46,6 +46,9 @@ const waterMaterial = new THREE.ShaderMaterial({
     uSmallWavesSpeed: { value: 0.706 },
     uSmallWaveIteration: { value: 4 },
 
+    uNoiseScale: { value: 1.5 }, // Set initial value for noise scale
+    uNoiseStrength: { value: 0.2 }, // Set initial value for noise strength
+
     uDepthColor: { value: new THREE.Color(debugObj.depthColor) },
     uSurfaceColor: { value: new THREE.Color(debugObj.surfaceColor) },
     uColorOffset: { value: 0.236 },
@@ -66,7 +69,7 @@ water.rotation.x = -Math.PI * 0.5;
 scene.add(water);
 
 //=============== Rain Particles ==================
-const rainParticleCount = 7000;
+const rainParticleCount = 5000;
 const rainParticles = new THREE.BufferGeometry();
 const particlePositions = new Float32Array(rainParticleCount * 3);
 
@@ -74,9 +77,9 @@ for (let i = 0; i < rainParticleCount; i++) {
   const i3 = i * 3;
 
   //=== initial position
-  particlePositions[i3] = (Math.random() - 0.5) * 5; // value: -2.5 & 2.5
-  particlePositions[i3 + 1] = Math.random() * 5;
-  particlePositions[i3 + 2] = (Math.random() - 0.5) * 5;
+  particlePositions[i3] = (Math.random() - 0.5) * 10; // value: -5 & 5
+  particlePositions[i3 + 1] = Math.random() * 10;
+  particlePositions[i3 + 2] = (Math.random() - 0.5) * 10;
 }
 
 rainParticles.setAttribute(
@@ -141,7 +144,7 @@ const audioLoader = new THREE.AudioLoader();
 audioLoader.load('./music/Thunderstorm.mp3', (buffer) => {
   sound.setBuffer(buffer);
   sound.setLoop(true);
-  sound.setVolume(0.5);
+  sound.setVolume(0.3);
   sound.play();
 });
 
@@ -169,9 +172,9 @@ const tick = () => {
     // Reset rain position if they hit the ground or go out of bounds
     if (positions[i3 + 1] < 0) {
       // moving the particle back above the ground
-      positions[i3 + 1] = Math.random() * 5;
-      positions[i3] = (Math.random() - 0.5) * 5;
-      positions[i3 + 2] = (Math.random() - 0.5) * 5;
+      positions[i3 + 1] = Math.random() * 10;
+      positions[i3] = (Math.random() - 0.5) * 10;
+      positions[i3 + 2] = (Math.random() - 0.5) * 10;
     }
   }
   rainParticles.attributes.position.needsUpdate = true;
