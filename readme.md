@@ -30,6 +30,12 @@ This project simulates a raging sea using custom shaders and Three.js. The goal 
    - Simulated using Three.js to reflect raindrops, contributing to the realism of a stormy sea.
 #### 4. Audio: <br/>
    - Includes ambient storm sound for an enhanced immersive experience.
+#### 5. Performance Enhancements: <br/>
+   - Optimized rendering and resource management to improve performance and reduce system load.
+#### 6. Pause and Resume: <br/>
+   - Added functionality to pause the simulation and sound when the user changes tabs, and resume them when the user returns.
+#### 7. Destroy Method: <br/>
+   - Implemented a method to clean up resources when the user leaves the page to prevent memory leaks and improve performance.
 
 <br/>
 
