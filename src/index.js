@@ -42,12 +42,12 @@ const waterMaterial = new THREE.ShaderMaterial({
     uBigWavesSpeed: { value: 1.427 },
 
     uSmallFrequency: { value: 3.123 },
-    uSmallWavesElevation: { value: 0.139 },
+    uSmallWavesElevation: { value: 0.201 },
     uSmallWavesSpeed: { value: 0.506 },
     uSmallWaveIteration: { value: 4 },
 
-    uNoiseScale: { value: 0.343 }, // Set initial value for noise scale
-    uNoiseStrength: { value: 0.5 }, // Set initial value for noise strength
+    uNoiseScale: { value: 1.043 },
+    uNoiseStrength: { value: 0.275 },
 
     uDepthColor: { value: new THREE.Color(debugObj.depthColor) },
     uSurfaceColor: { value: new THREE.Color(debugObj.surfaceColor) },
@@ -69,7 +69,7 @@ water.rotation.x = -Math.PI * 0.5;
 scene.add(water);
 
 //=============== Rain Particles ==================
-const rainParticleCount = 5000;
+const rainParticleCount = 4000;
 const rainParticles = new THREE.BufferGeometry();
 const particlePositions = new Float32Array(rainParticleCount * 3);
 
@@ -213,8 +213,6 @@ document.addEventListener('visibilitychange', () => {
 });
 
 //=============== Destroy Method ===================
-window.addEventListener('beforeunload', destroy);
-
 const destroy = () => {
   waterGeometry.dispose();
 
@@ -227,11 +225,11 @@ const destroy = () => {
     sound.stop();
   }
 
-  //=== Remove the mesh 
+  //=== Remove the mesh
   scene.remove(water);
   scene.remove(rainSystem);
 
-  //=== Remove the audio-listener 
+  //=== Remove the audio-listener
   camera.remove(listener);
 
   //=== Remove the resize event listener
@@ -239,6 +237,8 @@ const destroy = () => {
 
   renderer.dispose();
 };
+
+window.addEventListener('beforeunload', destroy);
 
 /************* resizeTimeout
  - Optimize Event Listeners: It waits 200 milliseconds after resizing stops before making the adjustments to avoid excessive updates during resizing. */
@@ -249,7 +249,7 @@ const destroy = () => {
 /************* cancelAnimationFrame
  -  is a function that takes the ID of an animation frame request (the one stored in animationFrameId) and cancels it. This stops the callback associated with that request from being called. */
 
- /************ beforeunload
+/************ beforeunload
   - is a browser event that is triggered just before a user leaves the page, such as by closing the tab or navigating to a different URL. 
   
   - This event gives developers the opportunity to run cleanup operations or prompt the user with a message before they leave the page. */

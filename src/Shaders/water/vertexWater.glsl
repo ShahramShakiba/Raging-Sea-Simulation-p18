@@ -35,11 +35,11 @@ void main() {
           ) * uSmallWavesElevation / i;
     }
 
-    //===== Add Perlin noise for more randomness
+    //===== More randomness
     float noise = 
       cnoise(
         vec3(
-          modelPosition.xz * uNoiseScale, uTime * 0.1
+          modelPosition.xz * uNoiseScale, uTime * uSmallWavesSpeed
           )
       ) * uNoiseStrength;
 
@@ -83,7 +83,14 @@ void main() {
 
 
 /* ****************  for (float i = 1.0; i <= uSmallWaveIteration; i++){}
-  - Starting i from 1.0 ensures no division by zero and creates a series of wave layers with progressively smaller influences, adding complexity to the wave pattern in a stable and natural way. */
+  - Starting i from 1.0 ensures no division by zero and 
+  - creates a series of wave layers with progressively smaller influences,
+  - adding complexity to the wave pattern in a stable and natural way.
+  
+  ? Iterations are used to create more complex and realistic small waves by adding multiple layers of noise. 
+  ? Each iteration adds noise at a different frequency and amplitude, which helps to simulate natural wave patterns that are not uniform and have varying scales and details. 
+  
+  ? Simply creating a single small wave would result in a less detailed and more artificial appearance. Iterations allow for the accumulation of finer details and variations in the wave patterns. */
 
 
 /* ****************  smallWaveElevation -= or +=
@@ -96,7 +103,9 @@ void main() {
 
 
 /* ****************  cnoise(vec3(...))
-  - Generates smooth, natural-looking variations for the wave pattern. */
+  - Generates smooth, natural-looking variations for the wave pattern.
+  
+  - generates a noise value based on the current position of the surface. */
 
 
 /* ** vec3(modelPosition.xz * uSmallFrequency * i, uTime * uSmallWavesSpeed)
@@ -115,6 +124,6 @@ void main() {
   * / i: 
     - Divides this wave height by the current iteration number.
 
-  - Ensures that each layer of small waves contributes less to the overall wave pattern, making the surface look more natural and detailed.
+  - Ensures that each layer of small-waves contributes less to the overall wave pattern, making the surface look more natural and detailed.
 
   - It reduces the height of each wave layer as the number of layers (iterations) increases, creating a natural and detailed wave pattern. */
