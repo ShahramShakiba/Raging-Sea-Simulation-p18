@@ -77,9 +77,9 @@ for (let i = 0; i < rainParticleCount; i++) {
   const i3 = i * 3;
 
   //=== initial position
-  particlePositions[i3] = (Math.random() - 0.5) * 10; // value: -5 & 5
-  particlePositions[i3 + 1] = Math.random() * 10;
-  particlePositions[i3 + 2] = (Math.random() - 0.5) * 10;
+  particlePositions[i3] = (Math.random() - 0.5) * 30; // value: -15 & 15
+  particlePositions[i3 + 1] = Math.random() * 15;
+  particlePositions[i3 + 2] = (Math.random() - 0.5) * 30;
 }
 
 rainParticles.setAttribute(
@@ -90,7 +90,8 @@ rainParticles.setAttribute(
 const particleMaterial = new THREE.PointsMaterial({
   map: rainTexture,
   color: 0xaaaaaa,
-  size: 0.025,
+  size: 0.055,
+  // sizeAttenuation: true,
   transparent: true,
   alphaTest: 0.5,
 });
@@ -136,13 +137,13 @@ const onWindowResize = () => {
 window.addEventListener('resize', onWindowResize);
 
 //=============== Wave Sound ======================
-const listener = new THREE.AudioListener();
-camera.add(listener);
+const audioListener = new THREE.AudioListener();
+camera.add(audioListener);
 
-const sound = new THREE.Audio(listener);
+const sound = new THREE.Audio(audioListener);
 const audioLoader = new THREE.AudioLoader();
-audioLoader.load('./music/Thunderstorm.mp3', (buffer) => {
-  sound.setBuffer(buffer);
+audioLoader.load('./music/Thunderstorm.mp3', (music) => {
+  sound.setBuffer(music); // assign the loaded audio data
   sound.setLoop(true);
   sound.setVolume(0.3);
   sound.play();
@@ -172,9 +173,9 @@ const tick = () => {
     // Reset rain position if they hit the ground or go out of bounds
     if (positions[i3 + 1] < 0) {
       // moving the particle back above the ground
-      positions[i3 + 1] = Math.random() * 10;
-      positions[i3] = (Math.random() - 0.5) * 10;
-      positions[i3 + 2] = (Math.random() - 0.5) * 10;
+      positions[i3 + 1] = Math.random() * 15;
+      positions[i3] = (Math.random() - 0.5) * 30;
+      positions[i3 + 2] = (Math.random() - 0.5) * 30;
     }
   }
   rainParticles.attributes.position.needsUpdate = true;
@@ -215,10 +216,8 @@ document.addEventListener('visibilitychange', () => {
 //=============== Destroy Method ===================
 const destroy = () => {
   waterGeometry.dispose();
-
   waterMaterial.dispose();
   particleMaterial.dispose();
-
   rainTexture.dispose();
 
   if (sound.isPlaying) {
@@ -230,7 +229,7 @@ const destroy = () => {
   scene.remove(rainSystem);
 
   //=== Remove the audio-listener
-  camera.remove(listener);
+  camera.remove(audioListener);
 
   //=== Remove the resize event listener
   window.removeEventListener('resize', onWindowResize);
@@ -239,6 +238,11 @@ const destroy = () => {
 };
 
 window.addEventListener('beforeunload', destroy);
+
+/* Audio buffer
+  - buffer: you can call it buffer or music or ... 
+  
+  - is part of the Web Audio API and represents a short audio asset that is completely loaded into memory, making it suitable for immediate playback without the need for continuous streaming. */
 
 /************* resizeTimeout
  - Optimize Event Listeners: It waits 200 milliseconds after resizing stops before making the adjustments to avoid excessive updates during resizing. */
